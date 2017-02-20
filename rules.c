@@ -338,7 +338,7 @@ void getRulesPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font 
                 positionText.y = 223;
                 SDL_BlitSurface(text, NULL, window, &positionText);
 
-                image = IMG_Load("images/rulesboook_rules.png");
+                image = IMG_Load("images/rulesbook_rules.png");
                 positionImage.x = positionText.x + text->w;
                 positionImage.y = 223;
                 SDL_BlitSurface(image, NULL, window, &positionImage);

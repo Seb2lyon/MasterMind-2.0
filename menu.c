@@ -8,6 +8,7 @@
 #include "about.h"
 #include "rules.h"
 #include "scores.h"
+#include "game.h"
 
 
 void getMenuPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *fontTextLarge, TTF_Font *fontTextNormal, TTF_Font *fontTextSmall, FMOD_SYSTEM *system, FMOD_SOUND *button)
@@ -16,7 +17,7 @@ void getMenuPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
     SDL_Rect positionBackground = {0}, positionTitle = {0}, positionGame = {0}, positionScores = {0}, positionRules = {0}, positionQuit = {0}, positionAbout = {0}, positionSound_on = {0};
     SDL_Color colorTitle = {255, 255, 255, 0};
     SDL_Event event = {0};
-    int continued = 1, clickGame = 0, clickScores = 0, clickRules = 0, clickQuit = 0, clickAbout = 0, referer = 1, goAbout = 0, goRules = 0, goScores = 0;
+    int continued = 1, clickGame = 0, clickScores = 0, clickRules = 0, clickQuit = 0, clickAbout = 0, referer = 1, goAbout = 0, goRules = 0, goScores = 0, goGame = 0;
 
 
     background = SDL_CreateRGBSurface(SDL_HWSURFACE, WINDOW_W, WINDOW_H, 32, 0, 0, 0, 0);
@@ -188,9 +189,9 @@ void getMenuPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                     SDL_Flip(window);
                     clickGame = 0;
 
-                    // Direction page Jeu
+                    goGame = 1;
 
-                    // continued = 0;
+                    continued = 0;
                 }
                 else if(event.button.button == SDL_BUTTON_LEFT && clickScores == 1)
                 {
@@ -262,6 +263,9 @@ void getMenuPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
     {
         getScoresPage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button);
     }
-}
 
-// Page JEU
+    if(goGame)
+    {
+        getGamePage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button);
+    }
+}
