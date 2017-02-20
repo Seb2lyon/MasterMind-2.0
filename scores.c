@@ -11,14 +11,15 @@
 
 void getScoresPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *fontTextLarge, TTF_Font *fontTextNormal, TTF_Font *fontTextSmall, FMOD_SYSTEM *system, FMOD_SOUND *button)
 {
-    SDL_Surface *background = NULL, *title = NULL, *pseudo = NULL, *text = NULL, *image = NULL, *quit = NULL;
-    SDL_Rect positionBackground = {0}, positionTitle = {0}, positionPseudo = {0}, positionText = {0}, positionImage = {0}, positionQuit = {0};
+    SDL_Surface *background = NULL, *title = NULL, *pseudo = NULL, *text = NULL, *textWhite = NULL, *image = NULL, *quit = NULL;
+    SDL_Rect positionBackground = {0}, positionTitle = {0}, positionPseudo = {0}, positionText = {0}, positionTextWhite = {0}, positionImage = {0}, positionQuit = {0};
     SDL_Color colorTitle = {255, 255, 255, 0};
     SDL_Color colorSubTitle = {0, 0, 255, 0};
     SDL_Color colorName = {153, 51, 0, 0};
     SDL_Color colorText = {0, 0, 0, 0};
     SDL_Event event = {0};
-    int continued = 1, playerNumber = 0, i = 0, clickQuit = 0;
+    int continued = 1, playerNumber = 0, i = 0, clickQuit = 0, calculateMinutes = 0, calculateSeconds = 0;
+    char timeOfGame[6] = {0};
     Winner player[5] = {{{0}}};
 
 
@@ -55,7 +56,10 @@ void getScoresPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font
     }
     else
     {
+        positionImage.x = 13;
         positionImage.y = 127;
+        positionText.x = 278;
+        positionText.y = 136;
 
         for(i = 0; i < playerNumber; i++)
         {
@@ -76,7 +80,6 @@ void getScoresPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font
                 default:
                     break;
             }
-            positionImage.x = 13;
             SDL_BlitSurface(image, NULL, window, &positionImage);
 
             TTF_SetFontStyle(fontTextLarge, TTF_STYLE_NORMAL);
@@ -88,141 +91,42 @@ void getScoresPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font
             SDL_FreeSurface(image);
 
             positionImage.y += 80;
+
+            TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
+            text = TTF_RenderText_Blended(fontTextSmall, player[i].currentDate, colorText);
+            SDL_BlitSurface(text, NULL, window, &positionText);
+            SDL_FreeSurface(text);
+
+            TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
+            text = TTF_RenderText_Blended(fontTextSmall, "Nombre de coups : ", colorText);
+            positionText.y += 17;
+            SDL_BlitSurface(text, NULL, window, &positionText);
+            positionTextWhite.x = positionText.x + text->w;
+            positionTextWhite.y = positionText.y;
+            SDL_FreeSurface(text);
+            TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
+            textWhite = TTF_RenderText_Blended(fontTextSmall, player[i].level, colorTitle);
+            SDL_BlitSurface(textWhite, NULL, window, &positionTextWhite);
+            SDL_FreeSurface(textWhite);
+
+            calculateMinutes = player[i].elapseTime / 60000;
+            calculateSeconds = (player[i].elapseTime % 60000) / 1000;
+            sprintf(timeOfGame, "%d:%d", calculateMinutes, calculateSeconds);
+
+            TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
+            text = TTF_RenderText_Blended(fontTextSmall, "Temps de jeu : ", colorText);
+            positionText.y += 17;
+            SDL_BlitSurface(text, NULL, window, &positionText);
+            positionTextWhite.x = positionText.x + text->w;
+            positionTextWhite.y = positionText.y;
+            SDL_FreeSurface(text);
+            TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
+            textWhite = TTF_RenderText_Blended(fontTextSmall, timeOfGame, colorTitle);
+            SDL_BlitSurface(textWhite, NULL, window, &positionTextWhite);
+            SDL_FreeSurface(textWhite);
+
+            positionText.y += 46;
         }
-
-
-
-
-
-
-
-
-
-
-
-        // Calcul du temps écoulé via player->elapseTime (en millième de secondes)
-
-
-        // Rien que pour vos yeux
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Le 16/02/2017 à 08:21", colorText);
-        positionText.x = 278;
-        positionText.y = 136;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Nombre de coups : ", colorText);
-        positionText.x = 278;
-        positionText.y = 153;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        positionText.x = positionText.x + text->w;
-        positionText.y = 153;
-        SDL_FreeSurface(text);
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "3", colorTitle);
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Temps de jeu : ", colorText);
-        positionText.x = 278;
-        positionText.y = 170;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        positionText.x = positionText.x + text->w;
-        positionText.y = 170;
-        SDL_FreeSurface(text);
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "03:42", colorTitle);
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Le 26/01/2017 à 22:28", colorText);
-        positionText.x = 278;
-        positionText.y = 216;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Nombre de coups : ", colorText);
-        positionText.x = 278;
-        positionText.y = 233;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        positionText.x = positionText.x + text->w;
-        positionText.y = 233;
-        SDL_FreeSurface(text);
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "10", colorTitle);
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Temps de jeu : ", colorText);
-        positionText.x = 278;
-        positionText.y = 250;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        positionText.x = positionText.x + text->w;
-        positionText.y = 250;
-        SDL_FreeSurface(text);
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "115:42", colorTitle);
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Le 06/12/2016 à 05:02", colorText);
-        positionText.x = 278;
-        positionText.y = 296;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Nombre de coups : ", colorText);
-        positionText.x = 278;
-        positionText.y = 313;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        positionText.x = positionText.x + text->w;
-        positionText.y = 313;
-        SDL_FreeSurface(text);
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "10", colorTitle);
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "Temps de jeu : ", colorText);
-        positionText.x = 278;
-        positionText.y = 330;
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        positionText.x = positionText.x + text->w;
-        positionText.y = 330;
-        SDL_FreeSurface(text);
-        TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-        text = TTF_RenderText_Blended(fontTextSmall, "351:28", colorTitle);
-        SDL_BlitSurface(text, NULL, window, &positionText);
-        SDL_FreeSurface(text);
-
-        // Fin du juste pour vos yeux
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     quit = IMG_Load("images/return.png");
