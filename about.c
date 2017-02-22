@@ -5,6 +5,7 @@
 #include "SDL/SDL_ttf.h"
 #include "fmodex/fmod.h"
 #include "menu.h"
+#include "game.h"
 
 void getAboutPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *fontTextLarge, TTF_Font *fontTextNormal, TTF_Font *fontTextSmall, FMOD_SYSTEM *system, FMOD_SOUND *button, int referer)
 {
@@ -121,9 +122,5 @@ void getAboutPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font 
     if(referer == 1)
     {
         getMenuPage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button);
-    }
-    else
-    {
-        // Retour à la grille de jeu
     }
 }

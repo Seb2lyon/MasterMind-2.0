@@ -475,8 +475,4 @@ void getRulesPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font 
     {
         getMenuPage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button);
     }
-    else
-    {
-        // Retour à la grille de jeu
-    }
 }
