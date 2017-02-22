@@ -13,20 +13,23 @@
 
 void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *fontTextLarge, TTF_Font *fontTextNormal, TTF_Font *fontTextSmall, FMOD_SYSTEM *system, FMOD_SOUND *button)
 {
-    SDL_Surface *background = NULL, *board = NULL, *secretBoard = NULL, *secretCode = NULL, *about = NULL, *sound_on = NULL, *rulesbook = NULL, *quit = NULL, *color = NULL, *choice = NULL, *mouse = NULL, *arrow = NULL, *text = NULL;
-    SDL_Rect positionBackground = {0}, positionBoard = {0}, positionSecretBoard = {0}, positionSecretCode = {0}, positionAbout = {0}, positionSound_on = {0}, positionRulesbook = {0}, positionQuit = {0}, positionColor = {0}, positionChoice = {0}, positionMouse = {0}, positionArrow = {0}, positionText = {0};
+    SDL_Surface *background = NULL, *board = NULL, *secretBoard = NULL, *secretCode = NULL, *about = NULL, *sound_on = NULL, *rulesbook = NULL, *quit = NULL, *cancel = NULL, *validate = NULL, *color = NULL, *choice = NULL, *mouse = NULL, *arrow = NULL, *text = NULL;
+    SDL_Rect positionBackground = {0}, positionBoard = {0}, positionSecretBoard = {0}, positionSecretCode = {0}, positionAbout = {0}, positionSound_on = {0}, positionRulesbook = {0}, positionQuit = {0}, positionCancel = {0}, positionValidate = {0}, positionColor = {0}, positionChoice = {0}, positionMouse = {0}, positionArrow = {0}, positionText = {0};
     SDL_Color text1 = {0, 0, 0, 0};
     SDL_Color text2 = {255, 255, 255, 0};
     SDL_Event event = {0};
     TTF_Font *fontTextXLarge = NULL, *fontNumber = NULL;
-    FMOD_SOUND *pawn = NULL;
-    int continued = 1, i = 0, j = 0, startTime = 0, currentTime = 0, elapsedTime = 0, minutes = 0, seconds = 0, referer = 0, selected = 0, stock = 0, clickPawn = 0, clickAbout = 0, clickRules = 0, clickSound = 0, clickQuit = 0, shot = 1, theEnd = 1, secret[5] = {0}, colorChoice[11][5] = {{0}};
+    FMOD_SOUND *pawn = NULL, *cancelButton = NULL, *validateButton = NULL;
+    int continued = 1, i = 0, j = 0, startTime = 0, currentTime = 0, elapsedTime = 0, minutes = 0, seconds = 0, referer = 0, selected = 0, stock = 0, clickPawn = 0, clickAbout = 0, clickRules = 0, clickSound = 0, clickQuit = 0, clickCancel = 0, clickValidate = 0, shot = 1, theEnd = 0, secret[5] = {0}, colorChoice[11][5] = {{0}};
     char showShots[6] = {0}, showTime[10] = {0};
 
 
     startTime = SDL_GetTicks();
 
     FMOD_System_CreateSound(system, "sounds/pawn.wav", FMOD_CREATESAMPLE, 0, &pawn);
+    FMOD_System_CreateSound(system, "sounds/reload.wav", FMOD_CREATESAMPLE, 0, &cancelButton);
+    FMOD_System_CreateSound(system, "sounds/validate.wav", FMOD_CREATESAMPLE, 0, &validateButton);
+
     fontTextXLarge = TTF_OpenFont("fonts/letters.ttf", 28);
     fontNumber = TTF_OpenFont("fonts/number.ttf", 25);
 
@@ -142,6 +145,36 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
         positionSound_on.y = 406;
         SDL_BlitSurface(sound_on, NULL, window, &positionSound_on);
         SDL_FreeSurface(sound_on);
+
+        // Cancel
+        if(clickCancel == 0)
+        {
+            cancel = IMG_Load("images/cancel.png");
+            positionCancel.y = 128;
+        }
+        else
+        {
+            cancel = IMG_Load("images/cancel1.png");
+            positionCancel.y = 130;
+        }
+        positionCancel.x = (positionBoard.x / 2) - (cancel->w / 2);
+        SDL_BlitSurface(cancel, NULL, window, &positionCancel);
+        SDL_FreeSurface(cancel);
+
+        // Validate
+        if(clickValidate == 0)
+        {
+            validate = IMG_Load("images/validate.png");
+            positionValidate.y = 228;
+        }
+        else
+        {
+            validate = IMG_Load("images/validate1.png");
+            positionValidate.y = 230;
+        }
+        positionValidate.x = (positionBoard.x / 2) - (validate->w / 2);
+        SDL_BlitSurface(validate, NULL, window, &positionValidate);
+        SDL_FreeSurface(validate);
 
         // Colors available (selected or not)
         positionColor.y = 383;
@@ -329,44 +362,67 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                         }
                     }
 
-                    // Click to go to "About" page
-                    else if(event.button.x >= positionAbout.x && event.button.x <= positionAbout.x + 30 && event.button.y >= positionAbout.y && event.button.y <= positionAbout.y + 30)
+                    // Click "Cancel" button
+                    else if(clickCancel == 0 && event.button.x >= positionCancel.x && event.button.x <= positionCancel.x + 40 && event.button.y >= positionCancel.y && event.button.y <= positionCancel.y + 40)
                     {
-                        clickAbout = 1;
+                        for(i = 0; i < 4; i++)
+                        {
+                            colorChoice[shot - 1][i] = 0;
+                        }
 
+                        if(sound)
+                        {
+                            FMOD_System_PlaySound(system, 1, cancelButton, 0, NULL);
+                        }
+                        clickCancel = 1;
+                    }
+
+                    // Click "Validate" button
+                    else if(clickValidate == 0 && event.button.x >= positionValidate.x && event.button.x <= positionValidate.x + 40 && event.button.y >= positionValidate.y && event.button.y <= positionValidate.y + 40)
+                    {
+
+                        // ALL THE CHECKINGS TO DO
+
+                        if(sound)
+                        {
+                            FMOD_System_PlaySound(system, 1, validateButton, 0, NULL);
+                        }
+                        clickValidate = 1;
+                    }
+
+                    // Click to go to "About" page
+                    else if(clickAbout == 0 && event.button.x >= positionAbout.x && event.button.x <= positionAbout.x + 30 && event.button.y >= positionAbout.y && event.button.y <= positionAbout.y + 30)
+                    {
                         if(sound)
                         {
                             FMOD_System_PlaySound(system, 1, button, 0, NULL);
                         }
+                        clickAbout = 1;
                     }
 
                     // Click to go to "Rules" page
-                    else if(event.button.x >= positionRulesbook.x && event.button.x <= positionRulesbook.x + 40 && event.button.y >= positionRulesbook.y && event.button.y <= positionRulesbook.y + 40)
+                    else if(clickRules == 0 && event.button.x >= positionRulesbook.x && event.button.x <= positionRulesbook.x + 40 && event.button.y >= positionRulesbook.y && event.button.y <= positionRulesbook.y + 40)
                     {
-                        clickRules = 1;
-
                         if(sound)
                         {
                             FMOD_System_PlaySound(system, 1, button, 0, NULL);
                         }
+                        clickRules = 1;
                     }
 
                     // Click to go to "Menu" page
-                    else if(event.button.x >= positionQuit.x && event.button.x <= positionQuit.x + 40 && event.button.y >= positionQuit.y && event.button.y <= positionQuit.y + 40)
+                    else if(clickQuit == 0 && event.button.x >= positionQuit.x && event.button.x <= positionQuit.x + 40 && event.button.y >= positionQuit.y && event.button.y <= positionQuit.y + 40)
                     {
-                        clickQuit = 1;
-
                         if(sound)
                         {
                             FMOD_System_PlaySound(system, 1, button, 0, NULL);
                         }
+                        clickQuit = 1;
                     }
 
                     // Click to turn on/off the sound
                     else if(event.button.x >= positionSound_on.x && clickSound == 0 && event.button.x <= positionSound_on.x + 40 && event.button.y >= positionSound_on.y && event.button.y <= positionSound_on.y + 40)
                     {
-                        clickSound = 1;
-
                         if(sound)
                         {
                             sound = 0;
@@ -376,6 +432,7 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                             sound = 1;
                             FMOD_System_PlaySound(system, 1, button, 0, NULL);
                         }
+                        clickSound = 1;
                     }
                 }
                 else if(event.button.button == SDL_BUTTON_RIGHT)
@@ -438,13 +495,27 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                     SDL_ShowCursor(SDL_ENABLE);
                     continued = 0;
                 }
+
+                if(clickCancel == 1)
+                {
+                    clickCancel = 0;
+                    selected = 0;
+                    stock = 0;
+                }
+
+                if(clickValidate == 1)
+                {
+                    clickValidate = 0;
+                    selected = 0;
+                    stock = 0;
+                }
                 break;
 
             case SDL_MOUSEMOTION:
                 // Manage the cursor picture when it goes over a button
                 if(selected != 0)
                 {
-                    if((event.motion.x >= positionAbout.x && event.motion.x <= positionAbout.x + 30 && event.motion.y >= positionAbout.y && event.motion.y <= positionAbout.y + 30) || (event.motion.x >= positionRulesbook.x && event.motion.x <= positionRulesbook.x + 40 && event.motion.y >= positionRulesbook.y && event.motion.y <= positionRulesbook.y + 40) || (event.motion.x >= positionQuit.x && event.motion.x <= positionQuit.x + 40 && event.motion.y >= positionQuit.y && event.motion.y <= positionQuit.y + 40) || (event.motion.x >= positionSound_on.x && event.motion.x <= positionSound_on.x + 40 && event.motion.y >= positionSound_on.y && event.motion.y <= positionSound_on.y + 40) || (event.motion.x >= positionBoard.x && event.motion.x <= positionBoard.x + (31 * 8) && event.motion.y >= positionColor.y && event.motion.y <= positionColor.y + 30))
+                    if((event.motion.x >= positionAbout.x && event.motion.x <= positionAbout.x + 30 && event.motion.y >= positionAbout.y && event.motion.y <= positionAbout.y + 30) || (event.motion.x >= positionRulesbook.x && event.motion.x <= positionRulesbook.x + 40 && event.motion.y >= positionRulesbook.y && event.motion.y <= positionRulesbook.y + 40) || (event.motion.x >= positionQuit.x && event.motion.x <= positionQuit.x + 40 && event.motion.y >= positionQuit.y && event.motion.y <= positionQuit.y + 40) || (event.motion.x >= positionSound_on.x && event.motion.x <= positionSound_on.x + 40 && event.motion.y >= positionSound_on.y && event.motion.y <= positionSound_on.y + 40) || (event.motion.x >= positionBoard.x && event.motion.x <= positionBoard.x + (31 * 8) && event.motion.y >= positionColor.y && event.motion.y <= positionColor.y + 30) || (event.motion.x >= positionCancel.x && event.motion.x <= positionCancel.x + 40 && event.motion.y >= positionCancel.y && event.motion.y <= positionCancel.y + 40) || (event.motion.x >= positionValidate.x && event.motion.x <= positionValidate.x + 40 && event.motion.y >= positionValidate.y && event.motion.y <= positionValidate.y + 40))
                     {
                         stock = selected;
                         selected = 0;
@@ -457,7 +528,7 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                 }
                 else if(stock != 0)
                 {
-                    if((event.motion.x < positionAbout.x || event.motion.x > positionAbout.x + 30 || event.motion.y < positionAbout.y || event.motion.y > positionAbout.y + 30) && (event.motion.x < positionRulesbook.x || event.motion.x > positionRulesbook.x + 40 || event.motion.y < positionRulesbook.y || event.motion.y > positionRulesbook.y + 40) && (event.motion.x < positionQuit.x || event.motion.x > positionQuit.x + 40 || event.motion.y < positionQuit.y || event.motion.y > positionQuit.y + 40) && (event.motion.x < positionSound_on.x || event.motion.x > positionSound_on.x + 40 || event.motion.y < positionSound_on.y || event.motion.y > positionSound_on.y + 40) && (event.motion.x < positionBoard.x || event.motion.x > positionBoard.x + (31 * 8) || event.motion.y < positionColor.y || event.motion.y > positionColor.y + 30))
+                    if((event.motion.x < positionAbout.x || event.motion.x > positionAbout.x + 30 || event.motion.y < positionAbout.y || event.motion.y > positionAbout.y + 30) && (event.motion.x < positionRulesbook.x || event.motion.x > positionRulesbook.x + 40 || event.motion.y < positionRulesbook.y || event.motion.y > positionRulesbook.y + 40) && (event.motion.x < positionQuit.x || event.motion.x > positionQuit.x + 40 || event.motion.y < positionQuit.y || event.motion.y > positionQuit.y + 40) && (event.motion.x < positionSound_on.x || event.motion.x > positionSound_on.x + 40 || event.motion.y < positionSound_on.y || event.motion.y > positionSound_on.y + 40) && (event.motion.x < positionBoard.x || event.motion.x > positionBoard.x + (31 * 8) || event.motion.y < positionColor.y || event.motion.y > positionColor.y + 30) && (event.motion.x < positionCancel.x || event.motion.x > positionCancel.x + 40 || event.motion.y < positionCancel.y || event.motion.y > positionCancel.y + 40) && (event.motion.x < positionValidate.x || event.motion.x > positionValidate.x + 40 || event.motion.y < positionValidate.y || event.motion.y > positionValidate.y + 40))
                     {
                         selected = stock;
                         stock = 0;
@@ -477,6 +548,8 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
     }
 
     FMOD_Sound_Release(pawn);
+    FMOD_Sound_Release(cancelButton);
+    FMOD_Sound_Release(validateButton);
     TTF_CloseFont(fontNumber);
     TTF_CloseFont(fontTextXLarge);
     getMenuPage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button);
