@@ -52,5 +52,18 @@ case 8:\
 default:\
     break;\
 
+#define RESULT()\
+\
+case 1:\
+    result = IMG_Load("images/black.gif");\
+    break;\
+\
+case 2:\
+    result = IMG_Load("images/white.gif");\
+    break;\
+\
+default:\
+    break;\
+
 
 #endif // CONSTANTS
