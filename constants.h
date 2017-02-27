@@ -10,7 +10,7 @@ typedef struct Winner Winner;
 struct Winner
 {
     char name[10];
-    char level[5];
+    int level;
     int elapseTime;
     char currentDate[25];
 };
@@ -64,6 +64,5 @@ case 2:\
 \
 default:\
     break;\
-
 
 #endif // CONSTANTS

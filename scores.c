@@ -19,7 +19,7 @@ void getScoresPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font
     SDL_Color colorText = {0, 0, 0, 0};
     SDL_Event event = {0};
     int continued = 1, playerNumber = 0, i = 0, clickQuit = 0, calculateMinutes = 0, calculateSeconds = 0;
-    char timeOfGame[6] = {0};
+    char timeOfGame[6] = {0}, level[5] = {0};
     Winner player[5] = {{{0}}};
 
 
@@ -105,7 +105,8 @@ void getScoresPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font
             positionTextWhite.y = positionText.y;
             SDL_FreeSurface(text);
             TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
-            textWhite = TTF_RenderText_Blended(fontTextSmall, player[i].level, colorTitle);
+            sprintf(level, "%d", player[i].level);
+            textWhite = TTF_RenderText_Blended(fontTextSmall, level, colorTitle);
             SDL_BlitSurface(textWhite, NULL, window, &positionTextWhite);
             SDL_FreeSurface(textWhite);
 

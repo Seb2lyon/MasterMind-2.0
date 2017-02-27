@@ -6,21 +6,23 @@
 #include "SDL/SDL_ttf.h"
 #include "fmodex/fmod.h"
 #include "constants.h"
+#include "file.h"
 #include "menu.h"
+#include "name.h"
 #include "about.h"
 #include "rules.h"
 
 
 void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *fontTextLarge, TTF_Font *fontTextNormal, TTF_Font *fontTextSmall, FMOD_SYSTEM *system, FMOD_SOUND *button)
 {
-    SDL_Surface *background = NULL, *board = NULL, *secretBoard = NULL, *secretCode = NULL, *about = NULL, *sound_on = NULL, *rulesbook = NULL, *quit = NULL, *cancel = NULL, *validate = NULL, *color = NULL, *choice = NULL, *result = NULL, *mouse = NULL, *arrow = NULL, *text = NULL;
-    SDL_Rect positionBackground = {0}, positionBoard = {0}, positionSecretBoard = {0}, positionSecretCode = {0}, positionAbout = {0}, positionSound_on = {0}, positionRulesbook = {0}, positionQuit = {0}, positionCancel = {0}, positionValidate = {0}, positionColor = {0}, positionChoice = {0}, positionResult = {0}, positionMouse = {0}, positionArrow = {0}, positionText = {0};
+    SDL_Surface *background = NULL, *board = NULL, *secretBoard = NULL, *secretCode = NULL, *about = NULL, *sound_on = NULL, *rulesbook = NULL, *quit = NULL, *cancel = NULL, *validate = NULL, *color = NULL, *choice = NULL, *result = NULL, *mouse = NULL, *arrow = NULL, *text = NULL, *theEndButton = NULL;
+    SDL_Rect positionBackground = {0}, positionBoard = {0}, positionSecretBoard = {0}, positionSecretCode = {0}, positionAbout = {0}, positionSound_on = {0}, positionRulesbook = {0}, positionQuit = {0}, positionCancel = {0}, positionValidate = {0}, positionColor = {0}, positionChoice = {0}, positionResult = {0}, positionMouse = {0}, positionArrow = {0}, positionText = {0}, positionTheEnd = {0};
     SDL_Color text1 = {0, 0, 0, 0};
     SDL_Color text2 = {255, 255, 255, 0};
     SDL_Event event = {0};
     TTF_Font *fontTextXLarge = NULL, *fontNumber = NULL;
-    FMOD_SOUND *pawn = NULL, *cancelButton = NULL, *validateButton = NULL;
-    int continued = 1, i = 0, j = 0, white = 0, black = 0, startTime = 0, currentTime = 0, elapsedTime = 0, minutes = 0, seconds = 0, referer = 0, selected = 0, stock = 0, clickPawn = 0, clickAbout = 0, clickRules = 0, clickSound = 0, clickQuit = 0, clickCancel = 0, clickValidate = 0, shot = 1, theEnd = 0, complete = 0, secret[5] = {0}, colorResult[11][5] = {{0}}, colorChoice[11][5] = {{0}}, result1[5] = {0}, result2[5] = {0};
+    FMOD_SOUND *pawn = NULL, *cancelButton = NULL, *validateButton = NULL, *winSound = NULL, *looseSound = NULL;
+    int continued = 1, i = 0, j = 0, white = 0, black = 0, actualDate = 0, startTime = 0, currentTime = 0, elapsedTime = 0, minutes = 0, seconds = 0, referer = 0, selected = 0, stock = 0, bestScore = 0, clickPawn = 0, clickAbout = 0, clickRules = 0, clickSound = 0, clickQuit = 0, clickCancel = 0, clickValidate = 0, clickTheEnd = 0, shot = 1, theEnd = 0, win = 0, winBestScore = 0, loose = 0, complete = 0, secret[5] = {0}, colorResult[11][5] = {{0}}, colorChoice[11][5] = {{0}}, result1[5] = {0}, result2[5] = {0};
     char showShots[6] = {0}, showTime[10] = {0};
 
 
@@ -29,6 +31,8 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
     FMOD_System_CreateSound(system, "sounds/pawn.wav", FMOD_CREATESAMPLE, 0, &pawn);
     FMOD_System_CreateSound(system, "sounds/reload.wav", FMOD_CREATESAMPLE, 0, &cancelButton);
     FMOD_System_CreateSound(system, "sounds/validate.wav", FMOD_CREATESAMPLE, 0, &validateButton);
+    FMOD_System_CreateSound(system, "sounds/loose.wav", FMOD_CREATESAMPLE, 0, &looseSound);
+    FMOD_System_CreateSound(system, "sounds/win.mp3", FMOD_CREATESAMPLE, 0, &winSound);
 
     fontTextXLarge = TTF_OpenFont("fonts/letters.ttf", 28);
     fontNumber = TTF_OpenFont("fonts/number.ttf", 25);
@@ -263,7 +267,7 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
             {
                 RESULT()
             }
-            positionResult.x = positionBoard.x + 23;
+            positionResult.x = positionBoard.x + 22;
             if(colorResult[i][0] != 0)
             {
                 SDL_BlitSurface(result, NULL, window, &positionResult);
@@ -285,8 +289,8 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
             {
                 RESULT()
             }
-            positionResult.x = positionBoard.x + 23;
-            positionResult.y += 13;
+            positionResult.x = positionBoard.x + 22;
+            positionResult.y += 14;
             if(colorResult[i][2] != 0)
             {
                 SDL_BlitSurface(result, NULL, window, &positionResult);
@@ -304,7 +308,7 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                 SDL_FreeSurface(result);
             }
 
-            positionResult.y -= 43;
+            positionResult.y -= 44;
         }
 
         // Number of shots
@@ -373,6 +377,48 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
         SDL_FreeSurface(text);
 
         SDL_FreeSurface(board);
+
+        // End of the game
+        if(theEnd)
+        {
+            if(win)
+            {
+                if(clickTheEnd == 0)
+                {
+                    theEndButton = IMG_Load("images/win.png");
+                }
+                else
+                {
+                    theEndButton = IMG_Load("images/win1.png");
+                }
+            }
+            else if(loose)
+            {
+                if(clickTheEnd == 0)
+                {
+                    theEndButton = IMG_Load("images/loose.png");
+                }
+                else
+                {
+                    theEndButton = IMG_Load("images/loose1.png");
+                }
+            }
+            else if(winBestScore)
+            {
+                if(clickTheEnd == 0)
+                {
+                    theEndButton = IMG_Load("images/win_best_score.png");
+                }
+                else
+                {
+                    theEndButton = IMG_Load("images/win_best_score1.png");
+                }
+            }
+            positionTheEnd.x = (window->w / 2) - (theEndButton->w / 2);
+            positionTheEnd.y = 376;
+            SDL_BlitSurface(theEndButton, NULL, window, &positionTheEnd);
+            SDL_FreeSurface(theEndButton);
+        }
 
         SDL_Flip(window);
 
@@ -539,12 +585,23 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                                 // Win or loose ?
                                 if(black == 4)
                                 {
+                                    actualDate = time(NULL);
                                     if(sound)
                                     {
-                                        // SOUND OF WINNING
+                                        FMOD_System_PlaySound(system, 1, winSound, 0, NULL);
                                     }
-                                    // WIN
-                                    // COMPARE WITH THE BEST SCORES
+
+                                    bestScore = isBestScore(shot, elapsedTime);
+
+                                    if(bestScore)
+                                    {
+                                        winBestScore = 1;
+                                    }
+                                    else
+                                    {
+                                        win = 1;
+                                    }
+
                                     theEnd = 1;
                                 }
                                 else
@@ -562,12 +619,20 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                                     {
                                         if(sound)
                                         {
-                                            // SOUND OF LOOSING
+                                            FMOD_System_PlaySound(system, 1, looseSound, 0, NULL);
                                         }
 
-                                        // LOOSE
+                                        loose = 1;
+
                                         theEnd = 1;
                                     }
+                                }
+                            }
+                            else
+                            {
+                                if(sound)
+                                {
+                                    FMOD_System_PlaySound(system, 1, looseSound, 0, NULL);
                                 }
                             }
                         }
@@ -747,6 +812,28 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                     }
                     break;
 
+                case SDL_MOUSEBUTTONDOWN:
+                    if(event.button.button == SDL_BUTTON_LEFT)
+                    {
+                        if(clickTheEnd == 0 && event.button.x >= positionTheEnd.x + 200 && event.button.x <= positionTheEnd.x + 232 && event.button.y >= positionTheEnd.y + 15 && event.button.y <= positionTheEnd.y + 49)
+                        {
+                            if(sound)
+                            {
+                                FMOD_System_PlaySound(system, 1, button, 0, NULL);
+                            }
+                            clickTheEnd = 1;
+                        }
+                    }
+                    break;
+
+                case SDL_MOUSEBUTTONUP:
+                    if(clickTheEnd)
+                    {
+                        clickTheEnd = 0;
+                        continued = 0;
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -756,7 +843,17 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
     FMOD_Sound_Release(pawn);
     FMOD_Sound_Release(cancelButton);
     FMOD_Sound_Release(validateButton);
+    FMOD_Sound_Release(winSound);
+    FMOD_Sound_Release(looseSound);
     TTF_CloseFont(fontNumber);
     TTF_CloseFont(fontTextXLarge);
-    getMenuPage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button);
+
+    if(winBestScore)
+    {
+        getNamePage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button, elapsedTime, shot, actualDate);
+    }
+    else
+    {
+        getMenuPage(window, sound, fontTitle, fontTextLarge, fontTextNormal, fontTextSmall, system, button);
+    }
 }
