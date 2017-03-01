@@ -112,7 +112,15 @@ void getScoresPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font
 
             calculateMinutes = player[i].elapseTime / 60000;
             calculateSeconds = (player[i].elapseTime % 60000) / 1000;
-            sprintf(timeOfGame, "%d:%d", calculateMinutes, calculateSeconds);
+            if(calculateSeconds < 10)
+            {
+                sprintf(timeOfGame, "%d:0%d", calculateMinutes, calculateSeconds);
+            }
+            else
+            {
+                sprintf(timeOfGame, "%d:%d", calculateMinutes, calculateSeconds);
+            }
+
 
             TTF_SetFontStyle(fontTextSmall, TTF_STYLE_NORMAL);
             text = TTF_RenderText_Blended(fontTextSmall, "Temps de jeu : ", colorText);

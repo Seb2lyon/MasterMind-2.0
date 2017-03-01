@@ -62,7 +62,7 @@ void getAboutPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font 
     SDL_BlitSurface(quit, NULL, window, &positionQuit);
 
     TTF_SetFontStyle(fontTextSmall, TTF_STYLE_BOLD | TTF_STYLE_ITALIC);
-    copyright = TTF_RenderText_Blended(fontTextSmall, "16/02/2017 - version 1.0", color2); // Modifier la date
+    copyright = TTF_RenderText_Blended(fontTextSmall, "01/03/2017 - version 0.1", color2);
     positionCopyright.x = (window->w / 2) - (copyright->w / 2);
     positionCopyright.y = positionBackground.y + 262;
     SDL_BlitSurface(copyright, NULL, window, &positionCopyright);

@@ -198,6 +198,32 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
             SDL_FreeSurface(validate);
         }
 
+        // Colors placed on the board
+        positionChoice.y = positionBoard.y + 330;
+
+        for(j = 0; j < 10; j++)
+        {
+            positionChoice.x = positionBoard.x + 90;
+
+            for(i = 0; i < 4; i++)
+            {
+                switch(colorChoice[j][i])
+                {
+                    PAWN(choice)
+                }
+
+                if(colorChoice[j][i] != 0)
+                {
+                    SDL_BlitSurface(choice, NULL, window, &positionChoice);
+                    SDL_FreeSurface(choice);
+                }
+
+                positionChoice.x += 30;
+            }
+
+            positionChoice.y -= 30;
+        }
+
         // Colors available (selected or not)
         if(theEnd == 0)
         {
@@ -230,32 +256,6 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                 SDL_FreeSurface(color);
                 positionColor.x += 31;
             }
-        }
-
-        // Colors placed on the board
-        positionChoice.y = positionBoard.y + 330;
-
-        for(j = 0; j < 10; j++)
-        {
-            positionChoice.x = positionBoard.x + 90;
-
-            for(i = 0; i < 4; i++)
-            {
-                switch(colorChoice[j][i])
-                {
-                    PAWN(choice)
-                }
-
-                if(colorChoice[j][i] != 0)
-                {
-                    SDL_BlitSurface(choice, NULL, window, &positionChoice);
-                    SDL_FreeSurface(choice);
-                }
-
-                positionChoice.x += 30;
-            }
-
-            positionChoice.y -= 30;
         }
 
         // Results hints
@@ -448,30 +448,33 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                     if(event.button.button == SDL_BUTTON_LEFT)
                     {
                         // Click to select color
-                        if(clickPawn == 0 && event.button.y >= 383 && event.button.y < 383 + 31 && event.button.x >= positionBoard.x && event.button.x < positionBoard.x + (31 * 8))
+                        if((clickPawn == 0) && (event.button.y >= 383 && event.button.y <= 383 + 30))
                         {
-                            // Select color
-                            for(i = 1; i <= 8; i++)
+                            if((event.button.x >= positionBoard.x && event.button.x <= positionBoard.x + 30) || (event.button.x >= positionBoard.x + 31 && event.button.x <= positionBoard.x + 61) || (event.button.x >= positionBoard.x + 62 && event.button.x <= positionBoard.x + 92) || (event.button.x >= positionBoard.x + 93 && event.button.x <= positionBoard.x + 123) || (event.button.x >= positionBoard.x + 124 && event.button.x <= positionBoard.x + 154) || (event.button.x >= positionBoard.x + 155 && event.button.x <= positionBoard.x + 185) || (event.button.x >= positionBoard.x + 186 && event.button.x <= positionBoard.x + 216) || (event.button.x >= positionBoard.x + 217 && event.button.x <= positionBoard.x + 247))
                             {
-                                if(event.button.x >= (positionBoard.x - 31 + (31 * i)) && event.button.x < (positionBoard.x  - 31 + (31 * i) + 31))
+                                // Select color
+                                for(i = 1; i <= 8; i++)
                                 {
-                                    if(sound)
+                                    if(event.button.x >= (positionBoard.x - 31 + (31 * i)) && event.button.x < (positionBoard.x  - 31 + (31 * i) + 31))
                                     {
-                                        FMOD_System_PlaySound(system, 1, pawn, 0, NULL);
+                                        if(sound)
+                                        {
+                                            FMOD_System_PlaySound(system, 1, pawn, 0, NULL);
+                                        }
+                                        selected = i;
+                                        clickPawn = 1;
+                                        SDL_FreeSurface(mouse);
                                     }
-                                    selected = i;
-                                    clickPawn = 1;
-                                    SDL_FreeSurface(mouse);
                                 }
-                            }
 
-                            // Mouse turn into color
-                            switch(selected)
-                            {
-                                PAWN(mouse)
+                                // Mouse turn into color
+                                switch(selected)
+                                {
+                                    PAWN(mouse)
+                                }
+                                positionMouse.x = event.button.x - (mouse->w / 2);
+                                positionMouse.y = event.button.y - (mouse->h / 2);
                             }
-                            positionMouse.x = event.button.x - (mouse->w / 2);
-                            positionMouse.y = event.button.y - (mouse->h / 2);
                         }
 
                         // Click to place pawn
@@ -586,6 +589,8 @@ void getGamePage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *
                                 if(black == 4)
                                 {
                                     actualDate = time(NULL);
+                                    elapsedTime *= 1000;
+
                                     if(sound)
                                     {
                                         FMOD_System_PlaySound(system, 1, winSound, 0, NULL);
