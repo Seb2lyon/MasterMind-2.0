@@ -15,6 +15,7 @@
 #include "constants.h"
 #include "menu.h"
 
+
 int main(int argc, char *args[])
 {
     SDL_Surface *window = NULL, *background = NULL, *element = NULL;
