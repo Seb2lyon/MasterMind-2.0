@@ -7,6 +7,7 @@
 #include "menu.h"
 #include "game.h"
 
+
 void getAboutPage(SDL_Surface *window, int sound, TTF_Font *fontTitle, TTF_Font *fontTextLarge, TTF_Font *fontTextNormal, TTF_Font *fontTextSmall, FMOD_SYSTEM *system, FMOD_SOUND *button, int referer)
 {
     SDL_Surface *background = NULL, *title = NULL, *created = NULL, *creator = NULL, *message1 = NULL, *message2 = NULL, *quit = NULL, *copyright = NULL;
