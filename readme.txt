@@ -3,6 +3,9 @@ MasterMind 2.0 - Notes de version
 ==========================================
 
 
+- v. 1.0 (02.03.2017) - version déboguée
+
+
 - v. 0.1 (01.03.2017) - beta-test
 
 

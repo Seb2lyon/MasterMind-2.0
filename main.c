@@ -1,5 +1,5 @@
 /*------------------------------------*
- *    MasterMind 2.0 - version 0.1    *
+ *    MasterMind 2.0 - version 1.0    *
  *   Created and coded by Seb2lyon    *
  *   from 02/10/2017 to 03/01/2017    *
  *  dedicated to my love : Patricia   *
