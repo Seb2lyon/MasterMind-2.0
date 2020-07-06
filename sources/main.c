@@ -1,7 +1,7 @@
 /*------------------------------------*
- *    MasterMind 2.0 - version 1.0    *
+ *    MasterMind 2.0 - version 1.1    *
  *   Created and coded by Seb2lyon    *
- *   from 02/10/2017 to 03/01/2017    *
+ *   from 02/10/2017 to 07/07/2020    *
  *  dedicated to my love : Patricia   *
  *             ENJOY ;)               *
  *------------------------------------*/
